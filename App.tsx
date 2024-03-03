@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -15,38 +15,43 @@ import {
   Text,
   useColorScheme,
   View,
+  Pressable
 } from 'react-native';
 
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  authorize,
+  signout
+} from 'react-native-app-auth';
+
+// Local Resources
+import {
+  LightColors,
+  DarkColors,
+  styles,
+} from './';
 
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
 function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const ThemeColors = useColorScheme() === 'dark' ? DarkColors : LightColors;
   return (
     <View style={styles.sectionContainer}>
       <Text
         style={[
-          styles.sectionTitle,
+          styles.header3,
           {
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: ThemeColors.onSurface,
           },
         ]}>
         {title}
       </Text>
       <Text
         style={[
-          styles.sectionDescription,
+          styles.body,
           {
-            color: isDarkMode ? Colors.light : Colors.dark,
+            color: ThemeColors.onSurface,
           },
         ]}>
         {children}
@@ -57,10 +62,21 @@ function Section({children, title}: SectionProps): JSX.Element {
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const ThemeColors = isDarkMode ? DarkColors : LightColors;
 
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+    backgroundColor: ThemeColors.surface
+  }
+ 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  function onLoginPressed() {
+    setIsLoggedIn(true);
+  }
+
+  function onLogoutPressed() {
+    setIsLoggedIn(false);
+  }
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -68,51 +84,36 @@ function App(): JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
+      <Text style={[styles.header3, {margin: 24, color: ThemeColors.primary}]}>
+        nicea
+      </Text>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
         <View
           style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
+            backgroundColor: ThemeColors.surface,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+          {!isLoggedIn ? (
+            <Section title="Login">
+              Edit <Text style={styles.superHeavy}>App.tsx</Text> to change this
+              screen and then come back to see your edits.
+              <Pressable style={[styles.primaryButton, {backgroundColor: ThemeColors.onSurface}]} onPress={onLoginPressed}>
+                <Text style={[styles.body, {color: ThemeColors.surface}]}>Login</Text>
+              </Pressable>
+            </Section>
+          ) : (
+            <Section title="Logout">
+              Read the docs to discover what to do next:
+              <Pressable style={[styles.primaryButton, {backgroundColor: ThemeColors.onSurface}]} onPress={onLogoutPressed}>
+                <Text style={[styles.body, {color: ThemeColors.surface}]}>Logout</Text>
+              </Pressable>
+            </Section>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
