@@ -1,2 +1,2 @@
 # nicaea
-Asynchronous tribunal system
+React Native asynchronous tribunal system
